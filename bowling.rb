@@ -1,133 +1,187 @@
 require 'pry-byebug'
 class Game
   attr_accessor :rolls
-  attr_reader :score
+  attr_reader :score, :frames
 
   def initialize
-    @score = 0
-    @frame = 1
-    @max_rolls = max_rolls
-    @rolls = []
-    @frames = { 1=>[], 2=>[], 3=>[], 4=>[], 5=>[], 6=>[], 7=>[], 8=>[], 9=>[], 10=>[] }
+    @game_score = 0
+    @frame_builder = Frame.new
+    @frames = {}
   end
 
-
   def roll(pins)
-    raise Game::BowlingError.new('negative roll not allowed') if pins.negative?
-    raise Game::BowlingError.new('there are only 10 pins') if pins > 10
-    raise Game::BowlingError.new('10 frames already played') if ten_frames_played?
+    raise Game::BowlingError if pins.negative?
+    raise Game::BowlingError if ten_frames_played?
 
-    @rolls << pins
+
+    # build frame, merge with game frames
+    @frame_builder.build(pins)
+    @frames.merge!(@frame_builder.frames)
+
   end
 
   def ten_frames_played?
-    # FIXME - doesn't account for strikes earlier in the game
-      # Revisit when I refactor roll method to build @frames with each roll
-    return true if @rolls.size > 20
-    return false if @rolls.size < 20
-
-    tenth_frame_gets_fill_ball?
-  end
-
-  def tenth_frame_gets_fill_ball?
-    !(@rolls.slice(-2, 2).include?(10) || @rolls.slice(-2, 2).sum == 10)
-  end
-
-  def max_rolls
-    @frame == 10 ? 3 : 2
-  end
-
-  def game_has_ten_frames?
-    !@frames[10].nil? && (@frames[10].size == 2 || @frames[10].size == 3)
-
+    @frame_builder.frame_ten_full
   end
 
   def score
-    construct_frames
-
-    raise Game::BowlingError.new('Game must be played completly before scoring') unless @frames[10].size >= 2
+    raise Game::BowlingError unless ten_frames_played?
 
     @frames.each do |frame_num, throws|
+      @frame_score_builder = Score.new(frame_num, throws, frames)
+
       if frame_num == 10
-        @score += throws.compact.sum
+        @game_score += throws.sum
       else
-        score_frame(frame_num, throws)
+        @frame_score_builder.calculate
+        @game_score += @frame_score_builder.frame_score
       end
 
     end
-    @score
-  end
-
-  private
-
-  def score_frame(frame_num, throws)
-    score_strike(frame_num) if strike?(throws)
-    score_spare(frame_num) if spare?(throws)
-    score_open(throws) if open?(throws)
-  end
-
-  def score_strike(num)
-    next_frame = @frames[num + 1]
-    case next_frame.size
-    when 3
-      @score += next_frame.first(2).sum
-    when 2
-      @score += next_frame.sum
-    when 1
-      @score += next_frame.sum
-      @score += @frames[num + 2].first
-    end
-
-    @score += 10
-  end
-
-  def score_spare(frame_num)
-    @score += 10
-
-    @score += @frames[frame_num + 1].first
-  end
-
-  def score_open(throws)
-    @score += throws.sum
-  end
-
-
-  def construct_frames
-    reversed_rolls = @rolls.reverse
-
-    (1..10).each do |frame|
-      # @frames[frame] = []
-
-      # Frame 10 can have 3 throws
-      if frame == 10
-        reversed_rolls.size.times { @frames[frame] << reversed_rolls.pop }
-      else
-
-        # Strike has 1 roll
-        if reversed_rolls.last == 10
-          @frames[frame] << reversed_rolls.pop
-        else
-          2.times {  @frames[frame] << reversed_rolls.pop }
-        end
-      end
-    end
-  end
-
-  def spare?(throws)
-    throws.sum == 10 && throws.size == 2
-  end
-
-  def strike?(throws)
-    throws.sum == 10 && throws.size == 1
-  end
-
-  def open?(throws)
-    throws.sum < 10
+    @game_score
   end
 
   class BowlingError < StandardError
-    def initialize(message)
-      @message = message
+  end
+end
+
+class Score < Game
+  attr_reader :frame_score, :throws, :frame_number
+
+  def initialize(frame_number, throws, frames)
+    @frame_score = 0
+    @frame_number = frame_number
+    @throws = throws
+    @frames = frames
+  end
+
+  def calculate
+    score_strike if strike?
+    score_spare if spare?
+    score_open if open?
+  end
+
+  def score_strike
+    next_frame = @frames[frame_number + 1]
+    case next_frame.size
+    when 3
+      @frame_score += next_frame.first(2).sum
+    when 2
+      @frame_score += next_frame.sum
+    when 1
+      @frame_score += next_frame.sum
+      @frame_score += @frames[frame_number + 2].first
+    end
+
+    @frame_score += 10
+  end
+
+  def strike?
+    throws.sum == 10 && throws.size == 1
+  end
+
+  def score_spare
+    @frame_score += 10
+
+    @frame_score += @frames[frame_number + 1].first
+  end
+
+  def spare?
+    throws.sum == 10 && throws.size == 2
+  end
+
+  def score_open
+    @frame_score += throws.sum
+  end
+
+  def open?
+    throws.sum < 10
+  end
+
+end
+
+# Responsible for building of frames
+class Frame < Game
+  attr_accessor :frame_full
+  attr_reader :frames, :frame_ten_full
+
+  def initialize
+    @frame_full = false
+    @frame_ten_full = false
+    @frame_number = 1
+    @frames = { 1=>[], 2=>[], 3=>[], 4=>[], 5=>[], 6=>[], 7=>[], 8=>[], 9=>[], 10=>[] }
+  end
+
+  def bonus_roll?
+    rolls = frames[@frame_number]
+
+    if @frame_number == 10 && rolls.size == 2
+      return true if rolls.first == 10 || rolls.last == 10 || rolls.sum == 10
+    end
+
+    false
+  end
+
+  def build(roll)
+    add_roll_to_frame(roll)
+
+    increment_frame_number if frame_full? && !tenth_frame?
+
+    # binding.pry if roll == 6
+    raise Game::BowlingError if too_many_pins?(roll)
+  end
+
+  def increment_frame_number
+    @frame_number += 1
+  end
+
+  def add_roll_to_frame(roll)
+    frames[@frame_number] << roll
+  end
+
+  def frame_full?
+    rolls = frames[@frame_number]
+
+    tenth_frame? ? frame_ten_full?(rolls) : earlier_frame_full?(rolls)
+  end
+
+  def tenth_frame?
+    @frame_number == 10
+  end
+
+  # FIXME?
+  def frame_ten_full?(rolls)
+    return false if rolls.size == 1
+
+    if rolls.size == 3 || rolls.size == 2 && !bonus_roll?
+      @frame_ten_full = true
+
+      return true
+    end
+  end
+
+  def earlier_frame_full?(rolls)
+    rolls.first == 10 || rolls.size == 2
+  end
+
+  def too_many_pins?(roll)
+    return true if frames[@frame_number].any? { |roll| roll > 10 }
+
+    if tenth_frame?
+      return true if frames[@frame_number].sum > 30
+
+      # strike / strike / strike
+      # 0-9 / strike / strike
+
+
+      tenth_frame = frames[@frame_number]
+
+      if tenth_frame.size == 3
+        tenth_frame.first == 10 && tenth_frame[1] + roll > 10
+      end
+
+    else
+      frames[@frame_number].sum > 10
     end
   end
 end
