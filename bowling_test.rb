@@ -91,7 +91,7 @@ class BowlingTest < Minitest::Test
   end
 
   def test_strikes_with_the_two_roll_bonus_do_not_get_bonus_rolls
-    # skip
+    # skip # =>
     game = Game.new
     rolls = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 10]
     rolls.each { |pins| game.roll(pins) }
@@ -181,7 +181,7 @@ class BowlingTest < Minitest::Test
   end
 
   def test_the_second_bonus_rolls_after_a_strike_in_the_last_frame_cannot_be_a_strike_if_the_first_one_is_not_a_strike
-    # # skip
+    # skip
     game = Game.new
     rolls = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 6]
     rolls.each { |pins| game.roll(pins) }
