@@ -4,7 +4,7 @@ class Game
   attr_reader :score, :frames
 
   def initialize
-    @game_score = 0
+    @score= 0
     @frame_builder = Frame.new
     @frames = {}
   end
@@ -12,7 +12,6 @@ class Game
   def roll(pins)
     raise Game::BowlingError if pins.negative?
     raise Game::BowlingError if ten_frames_played?
-
 
     # build frame, merge with game frames
     @frame_builder.build(pins)
@@ -31,14 +30,14 @@ class Game
       @frame_score_builder = Score.new(frame_num, throws, frames)
 
       if frame_num == 10
-        @game_score += throws.sum
+        @score+= throws.sum
       else
         @frame_score_builder.calculate
-        @game_score += @frame_score_builder.frame_score
+        @score+= @frame_score_builder.frame_score
       end
 
     end
-    @game_score
+    @score
   end
 
   class BowlingError < StandardError
@@ -102,11 +101,9 @@ end
 
 # Responsible for building of frames
 class Frame < Game
-  attr_accessor :frame_full
   attr_reader :frames, :frame_ten_full
 
   def initialize
-    @frame_full = false
     @frame_ten_full = false
     @frame_number = 1
     @frames = { 1=>[], 2=>[], 3=>[], 4=>[], 5=>[], 6=>[], 7=>[], 8=>[], 9=>[], 10=>[] }
@@ -123,12 +120,12 @@ class Frame < Game
   end
 
   def build(roll)
+    raise Game::BowlingError if too_many_pins?(roll)
+
     add_roll_to_frame(roll)
 
     increment_frame_number if frame_full? && !tenth_frame?
 
-    # binding.pry if roll == 6
-    raise Game::BowlingError if too_many_pins?(roll)
   end
 
   def increment_frame_number
@@ -153,7 +150,7 @@ class Frame < Game
   def frame_ten_full?(rolls)
     return false if rolls.size == 1
 
-    if rolls.size == 3 || rolls.size == 2 && !bonus_roll?
+    if rolls.size == 3 || (rolls.size == 2 && !bonus_roll?)
       @frame_ten_full = true
 
       return true
@@ -164,24 +161,25 @@ class Frame < Game
     rolls.first == 10 || rolls.size == 2
   end
 
+  def more_than_ten_pins?(roll)
+    frames[@frame_number].sum + roll > 10
+  end
+
+  # def strike_followed_by_more_than_ten_pin_spare?(roll)
+  # end
+
+
   def too_many_pins?(roll)
-    return true if frames[@frame_number].any? { |roll| roll > 10 }
+    return true if roll > 10
+    return more_than_ten_pins?(roll) unless tenth_frame?
 
-    if tenth_frame?
-      return true if frames[@frame_number].sum > 30
+    tenth_frame = frames[@frame_number]
 
-      # strike / strike / strike
-      # 0-9 / strike / strike
+    return false if tenth_frame.all?(10)
 
-
-      tenth_frame = frames[@frame_number]
-
-      if tenth_frame.size == 3
-        tenth_frame.first == 10 && tenth_frame[1] + roll > 10
-      end
-
-    else
-      frames[@frame_number].sum > 10
+    if tenth_frame.size == 2
+      tenth_frame.first == 10 && tenth_frame[1] + roll > 10
     end
+
   end
 end
