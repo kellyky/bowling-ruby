@@ -25,7 +25,8 @@ class Game
     frame_number = @frame_builder.frame_number
     rolls = @frame_builder.frames[frame_number]
 
-    frame_number == 10 && @frame_builder.frame_ten_full?
+    frame_number == 10 && @frame_builder.frame_full?
+
   end
 
   public

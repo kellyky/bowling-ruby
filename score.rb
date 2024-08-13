@@ -5,6 +5,16 @@ require_relative 'frame'
 class Score
   attr_reader :throws, :frame_number, :frames
 
+  # Scoring checked from other classes
+  def self.strike?(throw)
+    throw == Game::STRIKE
+  end
+
+  # Scoring checked from other classes
+  def self.spare?(throws)
+    throws.sum == Game::PINS_PER_FRAME && throws.size == 2
+  end
+
   private
 
   def initialize(frame_number, throws, frames)
@@ -17,10 +27,12 @@ class Score
     throws.first == Game::STRIKE
   end
 
+  # now also exists as class method
   def spare?
     throws.sum == Game::PINS_PER_FRAME && throws.size == 2
   end
 
+  # now also exists as class method
   def open?
     throws.sum < Game::PINS_PER_FRAME
   end
