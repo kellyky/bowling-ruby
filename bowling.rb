@@ -18,7 +18,6 @@ class Game
   end
 
   def validate_roll(pins)
-    raise Game::BowlingError, 'Negative pins do not exist... in this world 🤔' if pins.negative?
     raise Game::BowlingError, 'All 10 frames already played' if ten_frames_played?
   end
 
@@ -26,7 +25,7 @@ class Game
     frame_number = @frame_builder.frame_number
     rolls = @frame_builder.frames[frame_number]
 
-    frame_number == 10 && @frame_builder.frame_ten_full?(rolls)
+    frame_number == 10 && @frame_builder.frame_ten_full?
   end
 
   public
