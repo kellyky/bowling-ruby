@@ -1,12 +1,12 @@
 require_relative 'bowling'
 require_relative 'roll'
 require_relative 'score'
-require_relative 'score_rule'
+require_relative 'strike_spare_open'
 
 # Responsible for building each frame
 # Normal rules apply - frames 1 - 9
 class Frame
-  include ScoreRule
+  include StrikeSpareOpen
 
   attr_reader :frames, :frame_number, :tenth_frame
 

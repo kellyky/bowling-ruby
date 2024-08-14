@@ -2,7 +2,7 @@ require_relative 'bowling'
 require_relative 'frame'
 
 # Scoring Rules - what is a strike, spare, open
-module ScoreRule
+module StrikeSpareOpen
   def strike?(throws)
     throws.first == Game::STRIKE
   end
