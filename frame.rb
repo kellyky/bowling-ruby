@@ -1,12 +1,14 @@
 require_relative 'bowling'
 require_relative 'roll'
 require_relative 'score'
+require_relative 'score_rule'
 
 # Responsible for building each frame
 # Normal rules apply - frames 1 - 9
 class Frame
-  attr_reader :frames, :frame_number
-  attr_accessor :rolls
+  include ScoreRule
+
+  attr_reader :frames, :frame_number, :tenth_frame
 
   # Initialization and setup
   def initialize
@@ -24,7 +26,6 @@ class Frame
       10 => [],
     }
 
-    self.rolls = rolls
   end
 
   def rolls
@@ -34,23 +35,25 @@ class Frame
   # Frame Management
   def build(pins)
     validate(pins)
+    tenth_frame? and make_tenth_frame_builder and @tenth_frame.validate(pins)
     frames[frame_number] << pins
-
     frame_full? && normal_frame? and increment_frame_number
+  end
+
+  def make_tenth_frame_builder
+    @tenth_frame = TenthFrame.new(rolls)
   end
 
   def increment_frame_number
     @frame_number += 1
   end
 
-  def full?
-    rolls.first == Game::STRIKE || rolls.size == Game::MAX_ROLLS_PER_REGULAR_FRAME
-  end
-
   def frame_full?
-    # normal_frame? ? full? : @tenth_frame.full?
-
-    normal_frame? ? full? : TenthFrame.full?(rolls)
+    if normal_frame?
+      rolls.first == Game::STRIKE || rolls.size == Game::MAX_ROLLS_PER_REGULAR_FRAME
+    else
+      @tenth_frame.full?
+    end
   end
 
   def tenth_frame?
@@ -65,44 +68,43 @@ class Frame
   def validate(pins)
     Roll.validate(pins)
 
-    too_many_pins?(pins) and raise Game::BowlingError, 'Frame cannot have that many pins'
+    normal_frame? and too_many_pins?(pins) and too_many_pins_error
   end
 
   def too_many_pins?(roll)
-    if normal_frame?
-      frames[frame_number].sum + roll > Game::PINS_PER_FRAME
-    else
-      TenthFrame.too_many_pins?(rolls, roll)
-    end
+    frames[frame_number].sum + roll > Game::PINS_PER_FRAME
   end
 
-  # Helper Methods
-  def strike?(roll)
-    roll == Game::STRIKE
+  def too_many_pins_error
+    raise Game::BowlingError, 'Frame cannot have that many pins'
+  end
+end
+
+# Tenth frame specific stuff
+class TenthFrame < Frame
+
+  attr_accessor :rolls
+
+  def initialize(rolls)
+    self.rolls = rolls
   end
 
-  def spare?(rolls)
-    rolls.sum == Game::PINS_PER_FRAME
+  def qualifies_for_bonus_roll?
+    strike?(rolls) || spare?(rolls.first(2))
   end
 
-  class TenthFrame < Frame
-  # Tenth frame specific stuff
+  def full?
+    rolls.size == 3 || (rolls.size == 2 && !qualifies_for_bonus_roll?)
+  end
 
-    def self.too_many_pins?(rolls, roll)
-      return false if rolls.all?(Game::STRIKE) && rolls.size <= 3
+  def too_many_pins?(roll)
+    return false if rolls.all?(Game::STRIKE) && rolls.size <= 3
 
-      rolls.size == 2 &&
-        Score.strike?(rolls.first) && rolls[1] + roll > Game::PINS_PER_FRAME
-    end
+    rolls.size == 2 &&
+      strike?(rolls) && rolls[1] + roll > Game::PINS_PER_FRAME
+  end
 
-    def self.qualifies_for_bonus_roll?(rolls)
-      rolls.size == 2 &&
-      Score.strike?(rolls.first)|| Score.strike?(rolls.last) ||
-          Score.spare?(rolls.first(2))
-    end
-
-    def self.full?(rolls)
-      rolls.size == 3 || (rolls.size == 2 && !self.qualifies_for_bonus_roll?(rolls))
-    end
+  def validate(roll)
+    too_many_pins?(roll) and too_many_pins_error
   end
 end

@@ -1,19 +1,12 @@
 require_relative 'bowling'
 require_relative 'frame'
+require_relative 'score_rule'
 
 # Responsible for scoring each frame
 class Score
+  include ScoreRule
+
   attr_reader :throws, :frame_number, :frames
-
-  # Scoring checked from other classes
-  def self.strike?(throw)
-    throw == Game::STRIKE
-  end
-
-  # Scoring checked from other classes
-  def self.spare?(throws)
-    throws.sum == Game::PINS_PER_FRAME && throws.size == 2
-  end
 
   private
 
@@ -21,20 +14,6 @@ class Score
     @frame_number = frame_number
     @throws = throws
     @frames = frames
-  end
-
-  def strike?
-    throws.first == Game::STRIKE
-  end
-
-  # now also exists as class method
-  def spare?
-    throws.sum == Game::PINS_PER_FRAME && throws.size == 2
-  end
-
-  # now also exists as class method
-  def open?
-    throws.sum < Game::PINS_PER_FRAME
   end
 
   def next_two_rolls
@@ -70,9 +49,9 @@ class Score
 
   def calculate
     case
-    when strike? then score_strike
-    when spare? then score_spare
-    when open? then score_open
+    when strike?(throws) then score_strike
+    when spare?(throws) then score_spare
+    when open?(throws) then score_open
     end
   end
 end
