@@ -1,18 +1,17 @@
 require_relative 'bowling_exception'
+require_relative 'frame'
 require_relative 'frame_type'
 
 # Responsible for scoring each frame
 class Score
-  MAX_PINS_PER_FRAME = 10
   ONE_MORE_FRAME = 1
-  TWO_MORE_FRAMES = 2
 
   include BowlingExeption
   include FrameType
 
-  attr_reader :throws, :frame_number, :frames
-
   private
+
+  attr_reader :throws, :frame_number, :frames
 
   def initialize(frame_number, throws, frames)
     @frame_number = frame_number
@@ -25,7 +24,6 @@ class Score
 
     case next_frame.size
     when 1
-      next_frame.sum + frames[frame_number + TWO_MORE_FRAMES].first
       next_frame.sum + frames[frame_number.next.next].first
     when 2..3
       next_frame.first(2).sum
@@ -35,11 +33,11 @@ class Score
   end
 
   def score_strike
-    MAX_PINS_PER_FRAME + next_two_rolls
+    Frame::PINS + next_two_rolls
   end
 
   def score_spare
-    MAX_PINS_PER_FRAME + frames[frame_number + ONE_MORE_FRAME].first
+    Frame::PINS + frames[frame_number + ONE_MORE_FRAME].first
   end
 
   def score_open

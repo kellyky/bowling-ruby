@@ -1,11 +1,9 @@
-require_relative 'bowling_exception'
 require_relative  'frame'
 
 # Responsible for game-play logic
 class Game
   include BowlingExeption
 
-  PINS_PER_FRAME = 10
   STRIKE = 10
   MAX_ROLLS_PER_REGULAR_FRAME = 2
 

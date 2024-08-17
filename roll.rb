@@ -1,4 +1,3 @@
-require_relative 'bowling_exception'
 require_relative 'score'
 
 # The roll in a frame - validating valid pins in a roll

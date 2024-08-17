@@ -1,4 +1,3 @@
-require_relative 'bowling_exception'
 require_relative 'roll'
 
 # Responsible for building each frame
@@ -8,6 +7,8 @@ class Frame
   include FrameType
 
   attr_reader :frames, :frame_number, :tenth_frame
+
+  PINS = 10
 
   # Initialization and setup
   def initialize
@@ -34,11 +35,13 @@ class Frame
   def build(pins)
     validate(pins)
     tenth_frame? and make_tenth_frame_builder and @tenth_frame.validate(pins)
+
     frames[frame_number] << pins
     frame_full? && normal_frame? and increment_frame_number
   end
 
   def make_tenth_frame_builder
+    # TODO: should this not use instance var?
     @tenth_frame = TenthFrame.new(rolls)
   end
 
@@ -70,7 +73,7 @@ class Frame
   end
 
   def too_many_pins?(roll)
-    frames[frame_number].sum + roll > Game::PINS_PER_FRAME
+    frames[frame_number].sum + roll > PINS
   end
 
   def too_many_pins_error
@@ -99,7 +102,7 @@ class TenthFrame < Frame
     return false if rolls.all?(Game::STRIKE) && rolls.size <= 3
 
     rolls.size == 2 &&
-      strike?(rolls) && rolls[1] + roll > Game::PINS_PER_FRAME
+      strike?(rolls) && rolls[1] + roll > PINS
   end
 
   def validate(roll)
