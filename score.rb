@@ -1,10 +1,8 @@
-require_relative 'bowling'
-require_relative 'frame'
-require_relative 'strike_spare_open'
+require_relative 'frame_types'
 
 # Responsible for scoring each frame
 class Score
-  include StrikeSpareOpen
+  include FrameTypes
 
   attr_reader :throws, :frame_number, :frames
 
