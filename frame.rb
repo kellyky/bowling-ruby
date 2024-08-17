@@ -1,9 +1,11 @@
+require_relative 'bowling_exception'
 require_relative 'roll'
 
 # Responsible for building each frame
 # Normal rules apply - frames 1 - 9
 class Frame
-  include FrameTypes
+  include BowlingExeption
+  include FrameType
 
   attr_reader :frames, :frame_number, :tenth_frame
 
@@ -72,7 +74,7 @@ class Frame
   end
 
   def too_many_pins_error
-    raise Game::BowlingError, 'Frame cannot have that many pins'
+    raise BowlingError, 'Frame cannot have that many pins'
   end
 end
 

@@ -1,7 +1,10 @@
+require_relative 'bowling_exception'
 require_relative  'frame'
 
 # Responsible for game-play logic
 class Game
+  include BowlingExeption
+
   PINS_PER_FRAME = 10
   STRIKE = 10
   MAX_ROLLS_PER_REGULAR_FRAME = 2
@@ -15,7 +18,7 @@ class Game
   end
 
   def validate_roll
-    raise Game::BowlingError, 'All 10 frames already played' if ten_frames_played?
+    raise BowlingError, 'All 10 frames already played' if ten_frames_played?
   end
 
   def ten_frames_played?
@@ -36,7 +39,7 @@ class Game
   end
 
   def score
-    raise Game::BowlingError, 'Game is not complete' unless ten_frames_played?
+    raise BowlingError, 'Game is not complete' unless ten_frames_played?
 
     @frames.each do |frame_number, throws|
       @frame_score_builder = Score.new(frame_number, throws, frames)
@@ -48,8 +51,5 @@ class Game
                 end
     end
     @score
-  end
-
-  class BowlingError < ArgumentError
   end
 end
