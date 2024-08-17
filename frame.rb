@@ -79,6 +79,7 @@ class Frame
 
   def build(pins)
     validate(pins)
+
     tenth_frame? and make_tenth_frame_builder and tenth_frame.validate(pins)
 
     frames[frame_number] << pins

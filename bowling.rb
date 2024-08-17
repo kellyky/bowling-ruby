@@ -38,17 +38,6 @@ class Game
   def score
     raise BowlingError, 'Game is not complete' unless ten_frames_played?
 
-    game_score = 0
-    frames.each do |frame_number, throws|
-      score = Score.new(frame_number, throws, frames)
-
-      frame_number == 10
-      game_score += if frame_number == 10
-                      score.tenth_frame
-                    else
-                      score.frame
-                    end
-    end
-    game_score
+    Score.game(frames)
   end
 end

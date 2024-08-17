@@ -7,6 +7,21 @@ class Score
   include BowlingExeption
   include FrameType
 
+  def self.game(frames)
+    game_score = 0
+
+    frames.each do |frame_number, throws|
+      score = new(frame_number, throws, frames)
+
+      game_score += if frame_number == 10
+                      score.tenth_frame
+                    else
+                      score.frame
+                    end
+    end
+    game_score
+  end
+
   private
 
   attr_reader :throws, :frame_number, :frames
