@@ -1,16 +1,17 @@
-require_relative  'frame'
+require_relative 'frame'
 
 # Responsible for game-play logic
 class Game
   include BowlingExeption
 
-  STRIKE = 10
+  STRIKE = Frame::PINS
   MAX_ROLLS_PER_REGULAR_FRAME = 2
 
   private
 
+  attr_reader :frames, :frame_builder
+
   def initialize
-    @score = 0
     @frame_builder = Frame.new
     @frames = {}
   end
@@ -20,34 +21,34 @@ class Game
   end
 
   def ten_frames_played?
-    frame_number = @frame_builder.frame_number
-    rolls = @frame_builder.frames[frame_number]
+    frame_number = frame_builder.frame_number
+    rolls = frame_builder.frames[frame_number]
 
-    @frame_builder.tenth_frame? && TenthFrame.new(rolls).full?
+    frame_builder.tenth_frame? && TenthFrame.new(rolls).full?
   end
 
   public
 
-  attr_reader :score, :frames
-
   def roll(pins)
     validate_roll
-    @frame_builder.build(pins)
-    frames.merge!(@frame_builder.frames)
+    frame_builder.build(pins)
+    frames.merge!(frame_builder.frames)
   end
 
   def score
     raise BowlingError, 'Game is not complete' unless ten_frames_played?
 
-    @frames.each do |frame_number, throws|
-      @frame_score_builder = Score.new(frame_number, throws, frames)
+    game_score = 0
+    frames.each do |frame_number, throws|
+      score = Score.new(frame_number, throws, frames)
 
-      @score += if frame_number == 10
-                  @frame_score_builder.tenth_frame
-                else
-                  @frame_score_builder.calculate
-                end
+      frame_number == 10
+      game_score += if frame_number == 10
+                      score.tenth_frame
+                    else
+                      score.frame
+                    end
     end
-    @score
+    game_score
   end
 end

@@ -6,13 +6,16 @@ class Frame
   include BowlingExeption
   include FrameType
 
-  attr_reader :frames, :frame_number, :tenth_frame
-
   PINS = 10
+
+  private
+
+  attr_accessor :tenth_frame
+  attr_writer :frame_number
 
   # Initialization and setup
   def initialize
-    @frame_number = 1
+    self.frame_number = 1
     @frames = {
        1 => [],
        2 => [],
@@ -31,18 +34,8 @@ class Frame
     frames[frame_number]
   end
 
-  # Frame Management
-  def build(pins)
-    validate(pins)
-    tenth_frame? and make_tenth_frame_builder and @tenth_frame.validate(pins)
-
-    frames[frame_number] << pins
-    frame_full? && normal_frame? and increment_frame_number
-  end
-
   def make_tenth_frame_builder
-    # TODO: should this not use instance var?
-    @tenth_frame = TenthFrame.new(rolls)
+    self.tenth_frame = TenthFrame.new(rolls)
   end
 
   def increment_frame_number
@@ -53,12 +46,8 @@ class Frame
     if normal_frame?
       rolls.first == Game::STRIKE || rolls.size == Game::MAX_ROLLS_PER_REGULAR_FRAME
     else
-      @tenth_frame.full?
+      tenth_frame.full?
     end
-  end
-
-  def tenth_frame?
-    frame_number == 10
   end
 
   def normal_frame?
@@ -79,11 +68,26 @@ class Frame
   def too_many_pins_error
     raise BowlingError, 'Frame cannot have that many pins'
   end
+
+  public
+
+  attr_reader :frames, :frame_number
+
+  def tenth_frame?
+    frame_number == 10
+  end
+
+  def build(pins)
+    validate(pins)
+    tenth_frame? and make_tenth_frame_builder and tenth_frame.validate(pins)
+
+    frames[frame_number] << pins
+    frame_full? && normal_frame? and increment_frame_number
+  end
 end
 
 # Tenth frame specific stuff
 class TenthFrame < Frame
-
   attr_accessor :rolls
 
   def initialize(rolls)

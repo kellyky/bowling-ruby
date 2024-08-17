@@ -4,8 +4,6 @@ require_relative 'frame_type'
 
 # Responsible for scoring each frame
 class Score
-  ONE_MORE_FRAME = 1
-
   include BowlingExeption
   include FrameType
 
@@ -37,7 +35,7 @@ class Score
   end
 
   def score_spare
-    Frame::PINS + frames[frame_number + ONE_MORE_FRAME].first
+    Frame::PINS + frames[frame_number.next].first
   end
 
   def score_open
@@ -50,7 +48,7 @@ class Score
     score_open
   end
 
-  def calculate
+  def frame
     case
     when strike?(throws) then score_strike
     when spare?(throws) then score_spare
