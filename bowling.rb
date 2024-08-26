@@ -27,6 +27,7 @@ class Game
 
   def roll(pins)
     raise BowlingError, 'All 10 frames already played' if ten_frames_played?
+
     frame_builder.build(pins)
     frames.merge!(frame_builder.frames)
   end

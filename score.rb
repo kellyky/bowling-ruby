@@ -7,6 +7,9 @@ class Score
   include BowlingExeption
   include FrameType
 
+  ONE_MORE_FRAME = 1
+  TWO_MORE_FRAMES = 2
+
   def self.game(frames)
     game_score = 0
 
@@ -33,11 +36,11 @@ class Score
   end
 
   def next_two_rolls
-    next_frame = frames[frame_number.next]
+    next_frame = frames[frame_number + ONE_MORE_FRAME]
 
     case next_frame.size
     when 1
-      next_frame.sum + frames[frame_number.next.next].first
+      next_frame.sum + frames[frame_number + TWO_MORE_FRAMES].first
     when 2..3
       next_frame.first(2).sum
     else
