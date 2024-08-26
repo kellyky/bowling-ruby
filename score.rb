@@ -24,12 +24,12 @@ class Score
 
   private
 
-  attr_reader :throws, :frame_number, :frames
+  attr_accessor :throws, :frame_number, :frames
 
   def initialize(frame_number, throws, frames)
-    @frame_number = frame_number
-    @throws = throws
-    @frames = frames
+    self.frame_number = frame_number
+    self.throws = throws
+    self.frames = frames
   end
 
   def next_two_rolls

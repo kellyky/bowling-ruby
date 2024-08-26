@@ -11,12 +11,12 @@ class Frame
   private
 
   attr_accessor :tenth_frame
-  attr_writer :frame_number
+  attr_writer :frame_number, :frames
 
   # Initialization and setup
   def initialize
     self.frame_number = 1
-    @frames = {
+    self.frames = {
        1 => [],
        2 => [],
        3 => [],
@@ -39,7 +39,7 @@ class Frame
   end
 
   def increment_frame_number
-    @frame_number += 1
+    self.frame_number += 1
   end
 
   def frame_full?

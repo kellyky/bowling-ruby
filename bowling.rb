@@ -9,15 +9,11 @@ class Game
 
   private
 
-  attr_reader :frames, :frame_builder
+  attr_accessor :frames, :frame_builder
 
   def initialize
-    @frame_builder = Frame.new
-    @frames = {}
-  end
-
-  def validate_roll
-    raise BowlingError, 'All 10 frames already played' if ten_frames_played?
+    self.frame_builder = Frame.new
+    self.frames = {}
   end
 
   def ten_frames_played?
@@ -30,7 +26,7 @@ class Game
   public
 
   def roll(pins)
-    validate_roll
+    raise BowlingError, 'All 10 frames already played' if ten_frames_played?
     frame_builder.build(pins)
     frames.merge!(frame_builder.frames)
   end
