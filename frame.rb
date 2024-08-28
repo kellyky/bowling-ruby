@@ -6,11 +6,11 @@ class Frame
   include BowlingException
   include FrameType
 
+  PINS = 10
+
   private
 
   attr_reader :frame_number
-
-  PINS = 10
 
   def initialize(frame_number)
     self.rolls = []
@@ -21,16 +21,8 @@ class Frame
 
   def valid_frame?
     tenth_frame and
-      !too_many_pins_tenth_frame? or
-      within_ten_pin_max?(rolls)
-  end
-
-  def within_ten_pin_max?(rolls)
-    rolls.sum <= PINS
-  end
-
-  def exceed_ten_pin_max?(rolls)
-    !within_ten_pin_max?(rolls)
+      not too_many_pins_tenth_frame? or
+      rolls.sum <= PINS
   end
 
   # 10th-frame-specific methods
@@ -70,7 +62,7 @@ class Frame
                       1
                     end
 
-    exceed_ten_pin_max?(rolls.last(roll_quantity))
+    rolls.last(roll_quantity).sum > PINS
   end
 
   public

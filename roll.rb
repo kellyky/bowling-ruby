@@ -4,9 +4,9 @@ require_relative 'bowling_exception'
 class Roll
   include BowlingException
 
-  private
-
   BOWLING_PINS = 0..Frame::PINS
+
+  private
 
   attr_accessor :pins
 

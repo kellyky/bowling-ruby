@@ -3,11 +3,11 @@ require_relative 'frame'
 class FrameCollection
   private
 
+  attr_accessor :frame_number, :tail, :head
+
   def initialize
     self.frame_number = 0
   end
-
-  attr_accessor :frame_number, :tail, :head
 
   public
 

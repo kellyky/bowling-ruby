@@ -16,7 +16,7 @@ class Game
 
   attr_accessor :frames, :current_frame
 
-  def no_more_rolls_available?
+  def bowling_frames_full?
     frames.tail && frames.tail.tenth_frame && frames.tail.tenth_frame_full?
   end
 
@@ -26,7 +26,7 @@ class Game
     roll = Roll.new(pins)
     roll.validate
 
-    raise BowlingError if no_more_rolls_available?
+    raise BowlingError if bowling_frames_full?
 
     if current_frame.nil? || current_frame.frame_full?
       frames.add_new_frame
@@ -37,7 +37,7 @@ class Game
   end
 
   def score
-    raise BowlingError unless no_more_rolls_available?
+    raise BowlingError unless bowling_frames_full?
 
     Score.game(frames)
   end
