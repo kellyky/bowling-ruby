@@ -7,9 +7,11 @@ class FrameCollection
     self.frame_number = 0
   end
 
+  attr_accessor :frame_number, :tail, :head
+
   public
 
-  attr_accessor :frame_number, :tail, :head
+  attr_reader :frame_number, :tail, :head
 
   def add_new_frame
     self.frame_number += 1

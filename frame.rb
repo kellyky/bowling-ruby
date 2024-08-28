@@ -21,33 +21,56 @@ class Frame
 
   def valid_frame?
     tenth_frame and
-      not too_many_pins_tenth_frame? or
-      rolls.sum <= PINS
+      !too_many_pins_tenth_frame? or
+      within_ten_pin_max?(rolls)
   end
 
-  # 10th frame specific
+  def within_ten_pin_max?(rolls)
+    rolls.sum <= PINS
+  end
+
+  def exceed_ten_pin_max?(rolls)
+    !within_ten_pin_max?(rolls)
+  end
+
+  # 10th-frame-specific methods
   def qualifies_for_bonus_roll?
-    strike?(rolls) || spare?(rolls.first(2))
+    tenth_frame_first_roll_strike? || tenth_frame_spare?
   end
 
-  # TODO: Simplify (future iteration)
+  # What are your thoughts about methods on lines 45 - 55?
+    # I abstracted them for readability in too_many_pins_tenth_frame?
+    # I'm trying to determine if (a) I've abstracted them too far or
+    # (b) if their definitions belong here vs in FrameType
+  def tenth_frame_spare?
+    spare?(rolls.first(2))
+  end
+
+  def tenth_frame_first_roll_strike?
+    strike?(rolls.first)
+  end
+
+  def tenth_frame_second_roll_strike?
+    strike?(rolls[1])
+  end
+
   def too_many_pins_tenth_frame?
-    return false if rolls.all?(Game::STRIKE) && rolls.size <= 3
     return false unless rolls.size == 3
+    return false if rolls.all?(Game::STRIKE)
 
-    # Spare with last roll more than 10 pins
-    first_two_rolls = rolls.take(2)
-    return rolls.last > PINS if spare?(first_two_rolls)
+    # Scenarios with too many pins:
+      # Spare with last roll more than 10 pins
+      # Strike roll 1 AND:
+        # (a) Strike roll 2 where roll 3 has more than 10 pins
+        # (b) Rolls 2 and 3 total more than 10 pins
 
-    # Strike roll 1 AND:
-      # (a) Strike roll 2 AND final roll has too many pins or
-      # (b) Too many total pins in rolls 2 and 3
-    if strike?(rolls.take(1))
-      return rolls.last > PINS if strike?([rolls[1]])
+    roll_quantity = if tenth_frame_first_roll_strike?
+                      tenth_frame_second_roll_strike? ? 1 : 2
+                    elsif tenth_frame_spare?
+                      1
+                    end
 
-      # last 2 rolls pins - too many if more than 10 total
-      rolls.drop(1).sum > PINS
-    end
+    exceed_ten_pin_max?(rolls.last(roll_quantity))
   end
 
   public
@@ -68,7 +91,7 @@ class Frame
     raise BowlingError unless valid_frame?
   end
 
-  # 10th frame specific
+  # 10th-frame-specific methods
   def tenth_frame?
     frame_number == 10
   end

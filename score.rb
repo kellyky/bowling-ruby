@@ -24,7 +24,7 @@ class Score
     throws = current_frame.rolls
 
     case
-    when strike?(throws) then score_strike(current_frame)
+    when strike?(throws.first) then score_strike(current_frame)
     when spare?(throws) then score_spare(current_frame)
     when open?(throws) then throws.sum
     end
