@@ -1,4 +1,4 @@
-module BowlingExeption
+module BowlingException
   class BowlingError < ArgumentError
   end
 end

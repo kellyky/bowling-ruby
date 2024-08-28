@@ -1,12 +1,22 @@
-require_relative 'score'
+require_relative 'frame'
+require_relative 'bowling_exception'
 
-# The roll in a frame - validating valid pins in a roll
 class Roll
-  include BowlingExeption
+  include BowlingException
 
-  BOWLING_PINS = 0..10
+  BOWLING_PINS = 0..Frame::PINS
 
-  def self.validate(pins)
-    BOWLING_PINS.include?(pins) or raise BowlingError, 'Pins needs to be in valid range (0 - 10)'
+  attr_accessor :pins
+
+  def initialize(pins)
+    self.pins = pins
+  end
+
+  def valid_roll?
+    BOWLING_PINS.include?(pins)
+  end
+
+  def validate
+    raise BowlingError unless valid_roll?
   end
 end

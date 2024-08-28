@@ -1,76 +1,63 @@
-require_relative 'bowling_exception'
 require_relative 'frame'
 require_relative 'frame_type'
+require_relative 'bowling'
 
-# Responsible for scoring each frame
 class Score
-  include BowlingExeption
   include FrameType
 
-  ONE_MORE_FRAME = 1
-  TWO_MORE_FRAMES = 2
-
   def self.game(frames)
-    game_score = 0
-
-    frames.each do |frame_number, throws|
-      score = new(frame_number, throws, frames)
-
-      game_score += if frame_number == 10
-                      score.tenth_frame
-                    else
-                      score.frame
-                    end
-    end
-    game_score
+    new(frames).score_game
   end
 
-  private
-
-  attr_accessor :throws, :frame_number, :frames
-
-  def initialize(frame_number, throws, frames)
-    self.frame_number = frame_number
-    self.throws = throws
+  def initialize(frames)
     self.frames = frames
   end
 
-  def next_two_rolls
-    next_frame = frames[frame_number + ONE_MORE_FRAME]
+  attr_accessor :frames
 
-    case next_frame.size
-    when 1
-      next_frame.sum + frames[frame_number + TWO_MORE_FRAMES].first
-    when 2..3
-      next_frame.first(2).sum
-    else
-      raise BowlingError, 'Frame must have 1-2 rolls (3 allowed for 10th frame)'
+  def score_game
+    score = 0
+
+    current_frame = frames.head
+
+    until current_frame.nil?
+      score += single_frame_score(current_frame)
+      current_frame = current_frame.next_frame
+    end
+
+    score
+  end
+
+  def single_frame_score(current_frame)
+    return current_frame.rolls.sum if current_frame.tenth_frame?
+
+    throws = current_frame.rolls
+
+    case
+    when strike?(throws) then score_strike(current_frame)
+    when spare?(throws) then score_spare(current_frame)
+    when open?(throws) then throws.sum
     end
   end
 
-  def score_strike
-    Frame::PINS + next_two_rolls
+  def score_spare(current_frame)
+    next_roll = current_frame.next_frame.rolls.first
+    Frame::PINS + next_roll
   end
 
-  def score_spare
-    Frame::PINS + frames[frame_number.next].first
+  def score_strike(current_frame)
+    Frame::PINS + next_two_rolls(current_frame)
   end
 
-  def score_open
-    throws.sum
-  end
-
-  public
-
-  def tenth_frame
-    score_open
-  end
-
-  def frame
-    case
-    when strike?(throws) then score_strike
-    when spare?(throws) then score_spare
-    when open?(throws) then score_open
+  def next_two_rolls(current_frame)
+    next_frame = current_frame.next_frame
+    case next_frame.rolls.size
+    when 1
+      next_frame.rolls.sum + next_frame.next_frame.rolls.first
+    when 2..3
+      next_frame.rolls.first(2).sum
+    else
+      raise Game::BowlingError, 'Frame must have 1-2 rolls (3 allowed for 10th frame)'
     end
   end
 end

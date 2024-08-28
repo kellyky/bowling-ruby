@@ -91,7 +91,7 @@ class BowlingTest < Minitest::Test
   end
 
   def test_strikes_with_the_two_roll_bonus_do_not_get_bonus_rolls
-    # skip # =>
+    # skip
     game = Game.new
     rolls = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 10]
     rolls.each { |pins| game.roll(pins) }

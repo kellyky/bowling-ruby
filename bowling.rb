@@ -1,39 +1,43 @@
 require_relative 'frame'
+require_relative 'frame_collection'
+require_relative 'roll'
+require_relative 'score'
 
-# Responsible for game-play logic
 class Game
-  include BowlingExeption
-
-  STRIKE = Frame::PINS
-  MAX_ROLLS_PER_REGULAR_FRAME = 2
+  include BowlingException
+  STRIKE = 10
 
   private
 
-  attr_accessor :frames, :frame_builder
-
   def initialize
-    self.frame_builder = Frame.new
-    self.frames = {}
+    self.frames = FrameCollection.new
+    self.current_frame = nil
   end
 
-  def ten_frames_played?
-    frame_number = frame_builder.frame_number
-    rolls = frame_builder.frames[frame_number]
-
-    frame_builder.tenth_frame? && TenthFrame.new(rolls).full?
-  end
+  attr_accessor :frames, :current_frame
 
   public
 
   def roll(pins)
-    raise BowlingError, 'All 10 frames already played' if ten_frames_played?
+    roll = Roll.new(pins)
+    roll.validate
 
-    frame_builder.build(pins)
-    frames.merge!(frame_builder.frames)
+    raise BowlingError if no_more_rolls_available?
+
+    if current_frame.nil? || current_frame.frame_full?
+      frames.add_new_frame
+      self.current_frame = frames.tail
+    end
+
+    current_frame.add_roll(pins)
+  end
+
+  def no_more_rolls_available?
+    !frames.tail.nil? && frames.tail.tenth_frame && frames.tail.tenth_frame_full?
   end
 
   def score
-    raise BowlingError, 'Game is not complete' unless ten_frames_played?
+    raise BowlingError unless no_more_rolls_available?
 
     Score.game(frames)
   end
