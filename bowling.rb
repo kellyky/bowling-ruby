@@ -33,7 +33,7 @@ class Game
   end
 
   def no_more_rolls_available?
-    !frames.tail.nil? && frames.tail.tenth_frame && frames.tail.tenth_frame_full?
+    frames.tail && frames.tail.tenth_frame && frames.tail.tenth_frame_full?
   end
 
   def score

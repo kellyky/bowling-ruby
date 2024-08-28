@@ -20,7 +20,7 @@ class Score
 
     current_frame = frames.head
 
-    until current_frame.nil?
+    while current_frame
       score += single_frame_score(current_frame)
       current_frame = current_frame.next_frame
     end

@@ -10,15 +10,15 @@ class FrameCollection
   def add_new_frame
     self.frame_number += 1
 
-    if tail.nil?
-      self.tail = Frame.new(frame_number)
-    else
+    if tail
       tail.next_frame = Frame.new(frame_number)
       self.tail = tail.next_frame
+    else
+      self.tail = Frame.new(frame_number)
     end
 
     tail.tenth_frame = true if tail.tenth_frame?
 
-    self.head = tail if head.nil?
+    self.head = tail unless head
   end
 end

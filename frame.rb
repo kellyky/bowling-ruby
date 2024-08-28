@@ -32,11 +32,9 @@ class Frame
   end
 
   def valid_frame?
-    if tenth_frame
-      !too_many_pins_tenth_frame?
-    else
+    tenth_frame and
+      not too_many_pins_tenth_frame? or
       rolls.sum <= PINS
-    end
   end
 
   # 10th frame specific logic
@@ -45,7 +43,7 @@ class Frame
   end
 
   def tenth_frame_full?
-    rolls.size == 3 || (rolls.size == 2 && !qualifies_for_bonus_roll?)
+    rolls.size == 3 || rolls.size == 2 && !qualifies_for_bonus_roll?
   end
 
   def qualifies_for_bonus_roll?
@@ -62,16 +60,14 @@ class Frame
     return rolls.last > PINS if spare?(first_two_rolls)
 
     # Strike roll 1 AND:
-      # (a) Strike roll 2 AND final roll has too many pins
+      # (a) Strike roll 2 AND final roll has too many pins or
       # (b) Too many total pins in rolls 2 and 3
     first_roll = rolls.take(1)
     if strike?(first_roll)
       return rolls.last > PINS if strike?([rolls[1]])
 
       last_two_rolls = rolls.drop(1)
-      return last_two_rolls.sum > PINS
+      last_two_rolls.sum > PINS
     end
-
-    false
   end
 end
