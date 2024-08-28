@@ -6,29 +6,17 @@ class Frame
   include BowlingException
   include FrameType
 
-  PINS = 10
+  private
 
-  attr_accessor :rolls, :next_frame, :tenth_frame, :frame_number
+  attr_reader :frame_number
+
+  PINS = 10
 
   def initialize(frame_number)
     self.rolls = []
     self.next_frame = nil
     self.tenth_frame = false
-    self.frame_number = frame_number
-  end
-
-  def frame_full?
-    if tenth_frame
-      tenth_frame_full?
-    else
-      rolls.first == 10 || rolls.size == 2
-    end
-  end
-
-  def add_roll(pins)
-    rolls << pins
-
-    raise BowlingError unless valid_frame?
+    @frame_number = frame_number
   end
 
   def valid_frame?
@@ -37,15 +25,7 @@ class Frame
       rolls.sum <= PINS
   end
 
-  # 10th frame specific logic
-  def tenth_frame?
-    frame_number == 10
-  end
-
-  def tenth_frame_full?
-    rolls.size == 3 || rolls.size == 2 && !qualifies_for_bonus_roll?
-  end
-
+  # 10th frame specific
   def qualifies_for_bonus_roll?
     strike?(rolls) || spare?(rolls.first(2))
   end
@@ -62,12 +42,38 @@ class Frame
     # Strike roll 1 AND:
       # (a) Strike roll 2 AND final roll has too many pins or
       # (b) Too many total pins in rolls 2 and 3
-    first_roll = rolls.take(1)
-    if strike?(first_roll)
+    if strike?(rolls.take(1))
       return rolls.last > PINS if strike?([rolls[1]])
 
-      last_two_rolls = rolls.drop(1)
-      last_two_rolls.sum > PINS
+      # last 2 rolls pins - too many if more than 10 total
+      rolls.drop(1).sum > PINS
     end
+  end
+
+  public
+
+  attr_accessor :rolls, :next_frame, :tenth_frame
+
+  def frame_full?
+    if tenth_frame
+      tenth_frame_full?
+    else
+      rolls.first == 10 || rolls.size == 2
+    end
+  end
+
+  def add_roll(pins)
+    rolls << pins
+
+    raise BowlingError unless valid_frame?
+  end
+
+  # 10th frame specific
+  def tenth_frame?
+    frame_number == 10
+  end
+
+  def tenth_frame_full?
+    rolls.size == 3 || rolls.size == 2 && !qualifies_for_bonus_roll?
   end
 end

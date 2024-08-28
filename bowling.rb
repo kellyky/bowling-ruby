@@ -16,6 +16,11 @@ class Game
 
   attr_accessor :frames, :current_frame
 
+
+  def no_more_rolls_available?
+    frames.tail && frames.tail.tenth_frame && frames.tail.tenth_frame_full?
+  end
+
   public
 
   def roll(pins)
@@ -30,10 +35,6 @@ class Game
     end
 
     current_frame.add_roll(pins)
-  end
-
-  def no_more_rolls_available?
-    frames.tail && frames.tail.tenth_frame && frames.tail.tenth_frame_full?
   end
 
   def score

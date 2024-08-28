@@ -1,11 +1,15 @@
 require_relative 'frame'
 
 class FrameCollection
-  attr_accessor :frame_number, :tail, :head
+  private
 
   def initialize
     self.frame_number = 0
   end
+
+  public
+
+  attr_accessor :frame_number, :tail, :head
 
   def add_new_frame
     self.frame_number += 1

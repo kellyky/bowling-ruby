@@ -9,24 +9,14 @@ class Score
     new(frames).score_game
   end
 
+  private
+
   def initialize(frames)
     self.frames = frames
   end
 
   attr_accessor :frames
 
-  def score_game
-    score = 0
-
-    current_frame = frames.head
-
-    while current_frame
-      score += single_frame_score(current_frame)
-      current_frame = current_frame.next_frame
-    end
-
-    score
-  end
 
   def single_frame_score(current_frame)
     return current_frame.rolls.sum if current_frame.tenth_frame?
@@ -59,5 +49,20 @@ class Score
     else
       raise Game::BowlingError, 'Frame must have 1-2 rolls (3 allowed for 10th frame)'
     end
+  end
+
+  public
+
+  def score_game
+    score = 0
+
+    current_frame = frames.head
+
+    while current_frame
+      score += single_frame_score(current_frame)
+      current_frame = current_frame.next_frame
+    end
+
+    score
   end
 end

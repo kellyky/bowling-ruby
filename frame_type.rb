@@ -3,6 +3,8 @@ require_relative 'frame'
 
 # Determine if a roll is a strike spare or open
 module FrameType
+  private
+
   def strike?(throws)
     throws.first == Game::STRIKE
   end
