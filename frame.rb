@@ -30,10 +30,7 @@ class Frame
     tenth_frame_first_roll_strike? || tenth_frame_spare?
   end
 
-  # What are your thoughts about methods on lines 45 - 55?
-    # I abstracted them for readability in too_many_pins_tenth_frame?
-    # I'm trying to determine if (a) I've abstracted them too far or
-    # (b) if their definitions belong here vs in FrameType
+  # Helpers for too_many_pins_tenth_frame?
   def tenth_frame_spare?
     spare?(rolls.first(2))
   end
@@ -51,10 +48,10 @@ class Frame
     return false if rolls.all?(Game::STRIKE)
 
     # Scenarios with too many pins:
-      # Spare with last roll more than 10 pins
-      # Strike roll 1 AND:
-        # (a) Strike roll 2 where roll 3 has more than 10 pins
-        # (b) Rolls 2 and 3 total more than 10 pins
+    #   Spare with last roll more than 10 pins
+    #   Strike roll 1 AND:
+    #     (a) Strike roll 2 where roll 3 has more than 10 pins
+    #     (b) Rolls 2 and 3 total more than 10 pins
 
     roll_quantity = if tenth_frame_first_roll_strike?
                       tenth_frame_second_roll_strike? ? 1 : 2
@@ -69,6 +66,7 @@ class Frame
 
   attr_accessor :rolls, :next_frame, :tenth_frame
 
+  # Standard frame methods
   def frame_full?
     if tenth_frame
       tenth_frame_full?
