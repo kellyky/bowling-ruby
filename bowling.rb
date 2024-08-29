@@ -11,7 +11,6 @@ class Game
 
   def initialize
     self.frames = FrameCollection.new
-    self.current_frame = nil
   end
 
   attr_accessor :frames, :current_frame
@@ -28,7 +27,7 @@ class Game
 
     raise BowlingError if bowling_frames_full?
 
-    if current_frame.nil? || current_frame.frame_full?
+    if !current_frame || current_frame.frame_full?
       frames.add_new_frame
       self.current_frame = frames.tail
     end
