@@ -1,16 +1,32 @@
-# Bowling
+🦺 README under construction 🚧
 
-Welcome to Bowling on Exercism's Ruby Track.
-If you need help running the tests or submitting your code, check out `HELP.md`.
+## About
 
-## Instructions
+My approach to Exercism's [Bowling](https://exercism.org/tracks/ruby/exercises/bowling) exercise, written in Ruby (v. 3.3.0).
 
-Score a bowling game.
+The Ruby code for the solution is my own; `bowling_test.rb` and `.exercism` - and some of the README below are from Exercism.
 
-Bowling is a game where players roll a heavy ball to knock down pins arranged in a triangle.
-Write code to keep track of the score of a game of bowling.
+### Requirements and Objective
+
+Write code to keep track of the score of a game of bowling:
+
+- `roll(pins)` is called each time the player rolls a ball.
+  The argument is the number of pins knocked down.
+- `score` is called only at the very end of the game.
+  It returns the total score for that game.
+
+
+## Test
+Test file bowling_test.rb	provided by Exercism. Test cases cover edge cases, including too many / few rolls, perfect game (all strikes), spare in the 10th frame, and more.
+
+To test my code:
+1. Clone this repo `git clone git@github.com:kellyky/bowling-ruby.git`
+2. `cd` into this directory
+3. Run the tests `ruby bowling_test.rb`
+
 
 ## Scoring Bowling
+_Section from Exercism: https://exercism.org/tracks/ruby/exercises/bowling_
 
 The game consists of 10 frames.
 A frame is composed of one or two ball throws with 10 pins standing at frame initialization.
@@ -26,7 +42,9 @@ There are three cases for the tabulation of a frame.
   The total value of a strike is 10 plus the number of pins knocked down in the next two throws.
   If a strike is immediately followed by a second strike, then the value of the first strike cannot be determined until the ball is thrown one more time.
 
-Here is a three frame example:
+
+<details>
+<summary>Toggle for a three frame example</summary>
 
 | Frame 1         | Frame 2       | Frame 3                |
 | :-------------: |:-------------:| :---------------------:|
@@ -49,8 +67,10 @@ The total value of the 10th frame is the total number of pins knocked down.
 For a tenth frame of X1/ (strike and a spare), the total value is 20.
 
 For a tenth frame of XXX (three strikes), the total value is 30.
+</details>
 
-## Requirements
+## Requirements of the Exercise
+_Section from Exercism: https://exercism.org/tracks/ruby/exercises/bowling_
 
 Write code to keep track of the score of a game of bowling.
 It should support two operations:
