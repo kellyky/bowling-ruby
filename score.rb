@@ -17,37 +17,50 @@ class Score
 
   attr_accessor :frames
 
+  def single_frame_score(frame)
+    return frame.rolls.sum if frame.tenth_frame?
 
-  def single_frame_score(current_frame)
-    return current_frame.rolls.sum if current_frame.tenth_frame?
-
-    throws = current_frame.rolls
-
-    case
-    when strike?(throws.first) then score_strike(current_frame)
-    when spare?(throws) then score_spare(current_frame)
-    when open?(throws) then throws.sum
+    score_frame_type.each do |frame_type, score_frame|
+      return score_frame.call(frame) if frame_type?(frame_type, frame)
     end
   end
 
-  def score_spare(current_frame)
-    next_roll = current_frame.next_frame.rolls.first
+  # TODO: is this method name descriptive enough?
+  # Method checks if the frame type to score matches the frame type in score_frame_type
+  def frame_type?(frame_type, frame)
+    send(frame_type, frame.rolls)
+  end
+
+  def score_frame_type
+    {
+      strike?: method(:score_strike),
+      spare?: method(:score_spare),
+      open?: method(:score_open)
+    }
+  end
+
+  def score_spare(frame)
+    next_roll = frame.next_frame.rolls.first
     Frame::PINS + next_roll
   end
 
-  def score_strike(current_frame)
-    Frame::PINS + next_two_rolls(current_frame)
+  def score_strike(frame)
+    Frame::PINS + next_two_rolls(frame)
   end
 
-  def next_two_rolls(current_frame)
-    next_frame = current_frame.next_frame
+  def score_open(frame)
+    frame.rolls.sum
+  end
+
+  def next_two_rolls(frame)
+    next_frame = frame.next_frame
     case next_frame.rolls.size
     when 1
       next_frame.rolls.sum + next_frame.next_frame.rolls.first
     when 2..3
       next_frame.rolls.first(2).sum
     else
-      raise Game::BowlingError, 'Frame must have 1-2 rolls (3 allowed for 10th frame)'
+      raise Game::BowlingError, 'Too many rolls for frame'
     end
   end
 
@@ -56,11 +69,11 @@ class Score
   def score_game
     score = 0
 
-    current_frame = frames.head
+    frame = frames.head
 
-    while current_frame
-      score += single_frame_score(current_frame)
-      current_frame = current_frame.next_frame
+    while frame
+      score += single_frame_score(frame)
+      frame = frame.next_frame
     end
 
     score

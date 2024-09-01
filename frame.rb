@@ -36,11 +36,11 @@ class Frame
   end
 
   def tenth_frame_first_roll_strike?
-    strike?(rolls.first)
+    strike?([rolls.first])
   end
 
   def tenth_frame_second_roll_strike?
-    strike?(rolls[1])
+    strike?([rolls[1]])
   end
 
   def too_many_pins_tenth_frame?
