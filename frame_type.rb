@@ -5,8 +5,8 @@ require_relative 'frame'
 module FrameType
   private
 
-  def strike?(pins)
-    pins == Game::STRIKE
+  def strike?(throws)
+    throws.count == 1 && throws.sum == Game::STRIKE
   end
 
   def spare?(throws)
