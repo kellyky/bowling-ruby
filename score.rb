@@ -21,9 +21,9 @@ class Score
     return frame.rolls.sum if frame.tenth_frame?
 
     score_by_frame_type = {
-      strike?: method(:score_strike),
-      spare?: method(:score_spare),
-      open?: -> (frame) { frame.rolls.sum },
+      strike?: -> (frame) { Frame::PINS + next_two_rolls(frame) },
+      spare?: -> (frame) { Frame::PINS + frame.next_frame.rolls.first },
+      open?: -> (frame) { frame.rolls.sum }
     }
 
     score_by_frame_type.each do |frame_type, score_frame|
@@ -33,15 +33,6 @@ class Score
 
   def frame_type_match?(frame_type, frame)
     send(frame_type, frame.rolls)
-  end
-
-  def score_spare(frame)
-    next_roll = frame.next_frame.rolls.first
-    Frame::PINS + next_roll
-  end
-
-  def score_strike(frame)
-    Frame::PINS + next_two_rolls(frame)
   end
 
   def next_two_rolls(frame)
