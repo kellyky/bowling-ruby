@@ -11,20 +11,20 @@ class Score
 
   private
 
+  attr_accessor :frames
+  attr_reader :score_by_frame_type
+
   def initialize(frames)
     self.frames = frames
+    @score_by_frame_type = {
+      strike?: ->(frame) { Frame::PINS + next_two_rolls(frame) },
+      spare?: ->(frame) { Frame::PINS + frame.next_frame.rolls.first },
+      open?: ->(frame) { frame.rolls.sum }
+    }
   end
-
-  attr_accessor :frames
 
   def single_frame_score(frame)
     return frame.rolls.sum if frame.tenth_frame?
-
-    score_by_frame_type = {
-      strike?: -> (frame) { Frame::PINS + next_two_rolls(frame) },
-      spare?: -> (frame) { Frame::PINS + frame.next_frame.rolls.first },
-      open?: -> (frame) { frame.rolls.sum }
-    }
 
     score_by_frame_type.each do |frame_type, score_frame|
       return score_frame.call(frame) if frame_type_match?(frame_type, frame)

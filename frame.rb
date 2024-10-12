@@ -78,7 +78,7 @@ class Frame
   def add_roll(pins)
     rolls << pins
 
-    raise BowlingError unless valid_frame?
+    raise BowlingError, "Too many pins for frame: #{rolls.join(' | ')}" unless valid_frame?
   end
 
   # 10th-frame-specific methods
