@@ -12,6 +12,7 @@ class Score
   }
 
   class << self
+
     private
 
     def next_two_rolls(frame)
@@ -25,6 +26,7 @@ class Score
         raise Game::BowlingError, 'Too many rolls for frame'
       end
     end
+
   end
 
   def self.game(frames)
