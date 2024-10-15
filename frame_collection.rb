@@ -1,6 +1,7 @@
 require_relative 'frame'
 
 class FrameCollection
+
   private
 
   attr_accessor :frame_number, :tail, :head
@@ -27,4 +28,5 @@ class FrameCollection
 
     self.head = tail unless head
   end
+
 end

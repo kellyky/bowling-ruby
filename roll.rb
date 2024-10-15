@@ -23,4 +23,5 @@ class Roll
   def validate
     raise BowlingError, "Invalid number of pins (#{pins}). Valid range is 0 through 10." unless valid_roll?
   end
+
 end

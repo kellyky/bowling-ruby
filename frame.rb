@@ -89,4 +89,5 @@ class Frame
   def tenth_frame_full?
     rolls.size == 3 || rolls.size == 2 && !qualifies_for_bonus_roll?
   end
+
 end

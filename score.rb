@@ -67,4 +67,5 @@ class Score
 
     score
   end
+
 end

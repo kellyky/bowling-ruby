@@ -45,4 +45,5 @@ class Game
 
     Score.game(frames)
   end
+
 end

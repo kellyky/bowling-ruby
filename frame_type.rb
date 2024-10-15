@@ -3,6 +3,7 @@ require_relative 'frame'
 
 # Determine if a roll is a strike spare or open
 module FrameType
+
   private
 
   def strike?(throws)
@@ -16,4 +17,5 @@ module FrameType
   def open?(throws)
     throws.sum < Frame::PINS
   end
+
 end
