@@ -6,8 +6,8 @@ class Score
   include FrameType
 
   SCORE_FRAME = {
-    strike?: ->(frame) { Frame::PINS + next_two_rolls(frame) },
-     spare?: ->(frame) { Frame::PINS + frame.next_frame.rolls.first },
+    strike?: ->(frame) { Game::PINS + next_two_rolls(frame) },
+     spare?: ->(frame) { Game::PINS + frame.next_frame.rolls.first },
       open?: ->(frame) { frame.rolls.sum },
   }
 

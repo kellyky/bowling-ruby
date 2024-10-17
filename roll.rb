@@ -1,10 +1,9 @@
 require_relative 'frame'
+require_relative 'bowling'
 require_relative 'bowling_exception'
 
 class Roll
   include BowlingException
-
-  BOWLING_PINS = 0..Frame::PINS
 
   private
 
@@ -15,13 +14,13 @@ class Roll
   end
 
   def valid_roll?
-    BOWLING_PINS.include?(pins)
+    (0..Game::PINS).include?(pins)
   end
 
   public
 
   def validate
-    raise BowlingError, "Invalid number of pins (#{pins}). Valid range is 0 through 10." unless valid_roll?
+    raise BowlingError, "Number of pins must be a number that includes 0 through #{Game::PINS}" unless valid_roll?
   end
 
 end

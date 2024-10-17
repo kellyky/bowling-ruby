@@ -6,8 +6,6 @@ class Frame
   include BowlingException
   include FrameType
 
-  PINS = 10
-
   private
 
   attr_reader :frame_number
@@ -22,15 +20,14 @@ class Frame
   def valid_frame?
     tenth_frame and
       not too_many_pins_tenth_frame? or
-      rolls.sum <= PINS
+      rolls.sum <= Game::PINS
   end
 
   # 10th-frame-specific methods
   def qualifies_for_bonus_roll?
     tenth_frame_first_roll_strike? || tenth_frame_spare?
   end
-
-  # Helpers for too_many_pins_tenth_frame?
+# Helpers for too_many_pins_tenth_frame?
   def tenth_frame_spare?
     spare?(rolls.first(2))
   end
@@ -59,7 +56,7 @@ class Frame
                       1
                     end
 
-    rolls.last(roll_quantity).sum > PINS
+    rolls.last(roll_quantity).sum > Game::PINS
   end
 
   public
@@ -78,7 +75,7 @@ class Frame
   def add_roll(pins)
     rolls << pins
 
-    raise BowlingError, "Too many pins for frame: #{rolls.join(' | ')}" unless valid_frame?
+    raise BowlingError, "Pins must not exceed #{Game::PINS}" unless valid_frame?
   end
 
   # 10th-frame-specific methods

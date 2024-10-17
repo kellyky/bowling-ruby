@@ -6,7 +6,8 @@ require_relative 'score'
 class Game
   include BowlingException
 
-  STRIKE = 10
+  PINS = 10
+  STRIKE = PINS
 
   private
 
@@ -30,7 +31,7 @@ class Game
     roll = Roll.new(pins)
     roll.validate
 
-    raise BowlingError, 'No rolls available' if bowling_frames_full?
+    raise BowlingError, 'Frame is full' if bowling_frames_full?
 
     if need_new_frame?
       frames.add_new_frame
@@ -41,7 +42,7 @@ class Game
   end
 
   def score
-    raise BowlingError, 'Cannot score incomplete game.' unless bowling_frames_full?
+    raise BowlingError, 'Game must be completed before it can be scored' unless bowling_frames_full?
 
     Score.game(frames)
   end
