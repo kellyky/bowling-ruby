@@ -35,10 +35,12 @@ class Game
 
     if need_new_frame?
       frames.add_new_frame
+
       self.current_frame = frames.tail
     end
 
     current_frame.add_roll(pins)
+      current_frame.frame_type
   end
 
   def score

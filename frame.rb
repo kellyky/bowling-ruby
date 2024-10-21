@@ -27,6 +27,7 @@ class Frame
   def qualifies_for_bonus_roll?
     tenth_frame_first_roll_strike? || tenth_frame_spare?
   end
+
 # Helpers for too_many_pins_tenth_frame?
   def tenth_frame_spare?
     spare?(rolls.first(2))
@@ -61,7 +62,7 @@ class Frame
 
   public
 
-  attr_accessor :rolls, :next_frame, :tenth_frame
+  attr_accessor :rolls, :next_frame, :tenth_frame, :score_as
 
   # Standard frame methods
   def frame_full?
@@ -76,6 +77,27 @@ class Frame
     rolls << pins
 
     raise BowlingError, 'Pins must not exceed %d pins' % [Game::PINS] unless valid_frame?
+  end
+
+  # Update frame type to strike, spare or open
+  def frame_type
+    return unless frame_full?
+
+    strike?(rolls) and self.score_as = :strike or
+      spare?(rolls) and self.score_as = :spare or
+      self.score_as = :open
+  end
+
+  def strike?(throws)
+    throws.count == 1 && throws.sum == Game::STRIKE
+  end
+
+  def spare?(throws)
+    throws.sum == Game::PINS && throws.size == 2
+  end
+
+  def open?(throws)
+    throws.sum < Game::PINS
   end
 
   # 10th-frame-specific methods

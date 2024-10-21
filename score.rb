@@ -6,9 +6,9 @@ class Score
   include FrameType
 
   SCORE_FRAME = {
-    strike?: ->(frame) { Game::PINS + next_two_rolls(frame) },
-     spare?: ->(frame) { Game::PINS + frame.next_frame.rolls.first },
-      open?: ->(frame) { frame.rolls.sum },
+    strike: ->(frame) { Game::PINS + next_two_rolls(frame) },
+     spare: ->(frame) { Game::PINS + frame.next_frame.rolls.first },
+      open: ->(frame) { frame.rolls.sum },
   }
 
   class << self
@@ -41,16 +41,12 @@ class Score
     self.frames = frames
   end
 
-  def single_frame_score(frame)
-    return frame.rolls.sum if frame.tenth_frame?
+  def single_frame_score(fframe)
+    require 'pry-byebug'
+    binding.pry
+    return fframe.rolls.sum if fframe.tenth_frame?
 
-    SCORE_FRAME.each do |frame_type, score_frame|
-      return score_frame.call(frame) if frame_type_match?(frame_type, frame)
-    end
-  end
-
-  def frame_type_match?(frame_type, frame)
-    send(frame_type, frame.rolls)
+    SCORE_FRAME[fframe.score_as].call(fframe)
   end
 
   public
