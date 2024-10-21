@@ -75,7 +75,7 @@ class Frame
   def add_roll(pins)
     rolls << pins
 
-    raise BowlingError, "Pins must not exceed #{Game::PINS}" unless valid_frame?
+    raise BowlingError, 'Pins must not exceed %d pins' % [Game::PINS] unless valid_frame?
   end
 
   # 10th-frame-specific methods

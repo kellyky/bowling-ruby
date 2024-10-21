@@ -20,7 +20,7 @@ class Roll
   public
 
   def validate
-    raise BowlingError, "Number of pins must be a number that includes 0 through #{Game::PINS}" unless valid_roll?
+    raise BowlingError, 'Number of pins must be a number that includes 0 through %d' % [Game::PINS] unless valid_roll?
   end
 
 end
