@@ -1,10 +1,17 @@
 require_relative 'bowling'
 require_relative 'bowling_exception'
-require_relative 'frame_type'
 
 class Frame
   include BowlingException
-  include FrameType
+
+  STRIKE = ->(rolls) { rolls.count == 1 && rolls.sum == Game::STRIKE }
+  SPARE  = ->(rolls) { rolls.sum == Game::PINS && rolls.size == 2 }
+
+  FRAME_TYPE = {
+    ->(rolls) { STRIKE.call(rolls) }     => :strike,
+    ->(rolls) { SPARE.call(rolls) }      => :spare,
+    ->(rolls) { rolls.sum < Game::PINS } => :open
+  }
 
   private
 
@@ -30,15 +37,15 @@ class Frame
 
 # Helpers for too_many_pins_tenth_frame?
   def tenth_frame_spare?
-    spare?(rolls.first(2))
+    SPARE.call(rolls.first(2))
   end
 
   def tenth_frame_first_roll_strike?
-    strike?([rolls.first])
+    STRIKE.call([rolls.first])
   end
 
   def tenth_frame_second_roll_strike?
-    strike?([rolls[1]])
+    STRIKE.call([rolls[1]])
   end
 
   def too_many_pins_tenth_frame?
@@ -79,25 +86,15 @@ class Frame
     raise BowlingError, 'Pins must not exceed %d pins' % [Game::PINS] unless valid_frame?
   end
 
-  # Update frame type to strike, spare or open
+  # Sets attribute score_as to :strike, :spare, or :open
   def frame_type
-    return unless frame_full?
-
-    strike?(rolls) and self.score_as = :strike or
-      spare?(rolls) and self.score_as = :spare or
-      self.score_as = :open
+    FRAME_TYPE.each do |check_score_type, score_type|
+      self.score_as = score_type if matching_frame_type?(rolls, check_score_type)
+    end
   end
 
-  def strike?(throws)
-    throws.count == 1 && throws.sum == Game::STRIKE
-  end
-
-  def spare?(throws)
-    throws.sum == Game::PINS && throws.size == 2
-  end
-
-  def open?(throws)
-    throws.sum < Game::PINS
+  def matching_frame_type?(rolls, check_score_type)
+    check_score_type.call(rolls)
   end
 
   # 10th-frame-specific methods

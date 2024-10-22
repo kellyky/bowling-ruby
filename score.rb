@@ -1,9 +1,7 @@
 require_relative 'frame'
-require_relative 'frame_type'
 require_relative 'bowling'
 
 class Score
-  include FrameType
 
   SCORE_FRAME = {
     strike: ->(frame) { Game::PINS + next_two_rolls(frame) },
@@ -42,8 +40,6 @@ class Score
   end
 
   def single_frame_score(fframe)
-    require 'pry-byebug'
-    binding.pry
     return fframe.rolls.sum if fframe.tenth_frame?
 
     SCORE_FRAME[fframe.score_as].call(fframe)

@@ -1,3 +1,4 @@
-.exercism
+.exercism/metadata.json
 bowling_test.rb	
+*.swp
 

@@ -40,7 +40,7 @@ class Game
     end
 
     current_frame.add_roll(pins)
-      current_frame.frame_type
+    current_frame.frame_type if current_frame.frame_full?
   end
 
   def score
