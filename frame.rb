@@ -4,8 +4,8 @@ require_relative 'bowling_exception'
 class Frame
   include BowlingException
 
-  STRIKE = ->(rolls) { rolls.count == 1 && rolls.sum == Game::STRIKE }
-  SPARE  = ->(rolls) { rolls.sum == Game::PINS && rolls.size == 2 }
+  STRIKE = ->(rolls) { rolls.count == 1 && rolls.sum == Game::STRIKE }  # returns true/false
+  SPARE  = ->(rolls) { rolls.sum == Game::PINS && rolls.size == 2 }     # returns true/false
 
   FRAME_TYPE = {
     ->(rolls) { STRIKE.call(rolls) }     => :strike,
@@ -73,11 +73,13 @@ class Frame
 
   # Standard frame methods
   def frame_full?
-    if tenth_frame
-      tenth_frame_full?
-    else
-      rolls.first == 10 || rolls.size == 2
-    end
+    tenth_frame_full? || standard_frame_full?
+  end
+
+  def standard_frame_full?
+    return false if tenth_frame?
+
+    rolls.first == 10 || rolls.size == 2
   end
 
   def add_roll(pins)
@@ -103,6 +105,8 @@ class Frame
   end
 
   def tenth_frame_full?
+    return false unless tenth_frame?
+
     rolls.size == 3 || rolls.size == 2 && !qualifies_for_bonus_roll?
   end
 

@@ -15,14 +15,24 @@ class Score
 
     def next_two_rolls(frame)
       next_frame = frame.next_frame
-      case next_frame.rolls.size
-      when 1
-        next_frame.rolls.sum + next_frame.next_frame.rolls.first
-      when 2..3
-        next_frame.rolls.first(2).sum
-      else
+
+      roll_quantity = next_frame.rolls.size
+
+      strike_next_frame(next_frame, roll_quantity) or
+        non_strike_next_frame(next_frame, roll_quantity) or
         raise Game::BowlingError, 'Too many rolls for frame'
-      end
+    end
+
+    def strike_next_frame(frame, roll_quantity)
+      return unless roll_quantity in 1..1
+
+      frame.rolls.sum + frame.next_frame.rolls.first
+    end
+
+    def non_strike_next_frame(frame, roll_quantity)
+      return unless roll_quantity in 2..3
+
+      frame.rolls.first(2).sum
     end
 
   end
