@@ -49,10 +49,10 @@ class Score
     self.frames = frames
   end
 
-  def single_frame_score(fframe)
-    return fframe.rolls.sum if fframe.tenth_frame?
+  def single_frame_score(frame)
+    return frame.rolls.sum if frame.tenth_frame?
 
-    SCORE_FRAME[fframe.score_as].call(fframe)
+    SCORE_FRAME[frame.score_as].call(frame)
   end
 
   public
