@@ -23,8 +23,6 @@ class FrameCollection
     self.tail = Frame.new(frame_number)
   end
 
-
-
   public
 
   attr_reader :frame_number, :tail, :head

@@ -12,7 +12,6 @@ class Game
   PINS = 10
   STRIKE = PINS
 
-
   private
 
   def initialize
