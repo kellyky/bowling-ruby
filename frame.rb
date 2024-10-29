@@ -8,8 +8,8 @@ class Frame
   SPARE  = ->(rolls) { rolls.sum == Game::PINS && rolls.size == 2 }     # returns true/false
 
   FRAME_TYPE = {
-    ->(rolls) { STRIKE.call(rolls) }     => :strike,
-    ->(rolls) { SPARE.call(rolls) }      => :spare,
+    ->(rolls) { STRIKE === rolls }       => :strike,
+    ->(rolls) { SPARE. === rolls }       => :spare,
     ->(rolls) { rolls.sum < Game::PINS } => :open
   }
 
@@ -37,15 +37,15 @@ class Frame
 
 # Helpers for too_many_pins_tenth_frame?
   def tenth_frame_spare?
-    SPARE.call(rolls.first(2))
+    SPARE[rolls.first(2)]
   end
 
   def tenth_frame_first_roll_strike?
-    STRIKE.call([rolls.first])
+    STRIKE[rolls.first(1)]
   end
 
   def tenth_frame_second_roll_strike?
-    STRIKE.call([rolls[1]])
+    STRIKE[[rolls[1]]]
   end
 
   def too_many_pins_tenth_frame?
@@ -96,7 +96,7 @@ class Frame
   end
 
   def matching_frame_type?(rolls, check_score_type)
-    check_score_type.call(rolls)
+    check_score_type[rolls]
   end
 
   # 10th-frame-specific methods
@@ -105,8 +105,6 @@ class Frame
   end
 
   def tenth_frame_full?
-    return false unless tenth_frame?
-
     rolls.size == 3 || rolls.size == 2 && !qualifies_for_bonus_roll?
   end
 
